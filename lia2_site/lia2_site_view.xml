@@ -1,0 +1,179 @@
+<?xml version="1.0"?>
+<openerp>
+	<data>
+
+		<!-- Add checkbox (Publish Project) in project settings --> 
+		<record id="project_portal_view" model="ir.ui.view">
+			<field name="name">project.lia2.portal.view</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="project.edit_project"/>
+            <field name="arch" type="xml">
+
+	            <label for="use_timesheets" position="after">
+	            	<field name="publish_in_portal" class="oe_inline"/>
+	                <label for="publish_in_portal"/>
+	            </label>
+
+	        </field>
+		</record>
+		<!-- Add checkbox (Publish) in employee settings --> 
+		<record id="employee_portal_view" model="ir.ui.view">
+			<field name="name">employee.lia2.portal.view</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="arch" type="xml">
+
+	            <field name="user_id" position="after">
+	            	<field name="publish_in_portal" class="oe_inline"/>
+	            </field>
+
+	        </field>
+		</record>
+
+		<record id="partner_view" model="ir.ui.view">
+			<field name="name">lia2.partner.view</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name="arch" type="xml">
+
+	            <group position="after">
+	            	<button name="send_invite_link" string="Send Portal Invite" type="object" icon="terp-mail-message-new"/>
+	            </group>
+
+	        </field>
+		</record>
+
+<!-- Templates -->
+        <template id="main_template" name="Portal Main Template">
+        	<t t-call="website.layout">
+        		<div id="wrapper">
+	        		<div class="container">
+	        			<div class="row">
+	        				<div class="col-md-8 projects_container">
+			        			<h1>Projekt</h1>
+			        			<br/><br/>			        			
+		        				<t t-foreach="projects" t-as="project">
+		        					<div class="project_list"><a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)"><t t-esc="project.name"/></a><br/><t t-esc="project.description"/></div>
+		        				</t>			        			
+		        			</div>
+	        				<div class="col-md-4 users_container">
+			        			<h1>Användare</h1>
+			        			<br/><br/>
+			        			
+		        				<t t-foreach="employees" t-as="employee">		        					
+		        					<div class="user_list">
+		        						<img class="employee-image" t-att-src="'data:image/jpeg;base64,%s' % (employee.image_small)"/>  
+		        						<a class="employee_name" t-att-href="'/lia-portal/%s/employee/%s' % (token, employee.id)">
+		        							<t t-esc="employee.name"/></a>     						
+		        					</div>			        					
+		        				</t>			        			
+			        		</div>		        			
+		        		</div>
+	        		</div>
+	        	</div>
+        	</t>
+        </template>
+
+        <template id="project_template" name="Portal Project Template">
+        	<t t-call="website.layout">
+        		<div id="project_container">
+        			<h1>Sprints</h1>
+        			<br/><br/>
+        			<ul>
+        				<t t-foreach="project.sprint_ids" t-as="sprint">
+        					<li><a t-att-href="'/lia-portal/%s/sprint/%s' % (token, sprint.id)"><t t-esc="sprint.name"/></a></li>
+        				</t>
+        			</ul>
+
+        		</div>
+        	</t>
+        </template>  
+
+        <template id="sprint_template" name="Portal Sprint Template">
+        	<t t-call="website.layout">
+        		<div id="sprint_container">
+        			<h1>Tasks</h1>
+        			<br/><br/>
+        			<ul>
+        				<t t-foreach="sprint.task_ids" t-as="task">
+        					<li><a t-att-href="'/lia-portal/%s/sprint/%s/task/%s' % (token, sprint.id, task.id)"><t t-esc="task.name"/></a></li>
+        				</t>
+        			</ul>
+
+        		</div>
+        	</t>
+        </template>    
+
+        <template id="unauthorized_template" name="Unauthorized Template">
+        	<t t-call="website.layout">
+        		<div id="unauthorized_container">
+        			<h1>Unauthorized</h1>
+        			<br/><br/>
+        			<p>You are not authorized for this request!
+        			 Please use the invite link that was sent to you to access this page!
+        			</p>
+        		</div>
+        	</t>
+        </template>       
+
+        <template id="employee_template" name="Portal Employee Template">
+        	<t t-call="website.layout">
+        		<div id="employee_container">
+        			<h1><t t-esc="employee.name"/></h1>
+        			<div t-field="employee.website_description"/>
+        			<ul>
+        				<t t-foreach="meetings" t-as="meeting">
+        					<li><a t-att-href="'/lia-portal/%s/meeting/%s' % (token, meeting.id)"><t t-esc="meeting.date_meeting"/></a></li>
+        				</t>
+        			</ul>
+        			<br/><br/>
+        			<p>Projects contributed to:</p>
+        			<br/>
+        			<ul>
+        				<t t-foreach="projects" t-as="project">
+        					<li><a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)"><t t-esc="project.name"/></a></li>
+        				</t>
+        			</ul>        			
+        		</div>
+        	</t>
+        </template>  
+
+        <template id="meeting_template" name="Portal Meeting Template">
+        	<t t-call="website.layout">
+        		<div id="meeting_container">
+        			<h1><t t-esc="meeting.date_meeting"/></h1>  
+
+      				<h3>Vad har du gjort sedan förra mötet?</h3><br/>
+      				<p><t t-esc="meeting.question_yesterday"/></p><br/>
+      				<h3>Vad planerar du att göra tills nästa möte?</h3><br/>
+      				<p><t t-esc="meeting.question_today"/></p><br/>
+      				<h3>Finns det någonting som hindrar dig?</h3><br/>
+      				<p><t t-esc="meeting.question_blocks"/></p>
+
+        		</div>
+        	</t>
+        </template> 
+
+        <template id="theme" inherit_id="website.theme">
+        	<xpath expr="//link[last()]" position="after">
+        		<link rel="stylesheet" href="/lia2_site/static/src/css/custom.css"/>
+        	</xpath>
+        </template>
+
+
+		<record id="email_template_id" model="email.template">
+	            <field name="name">Email template for sending invite link</field>
+	            <field name="email_from">molk@molk.com</field>
+	            <field name="subject">Inbjudan till LIA-portal</field>
+	            <field name="model_id" ref="base.model_res_partner"/>
+	            <field name="auto_delete" eval="True"/>
+	            <field name="email_to">${object.email or ''}</field>
+	            <field name="body_html">
+	                <![CDATA[
+	                <h1>Hej ${object.name} här är din injudningslänk:</h1></br>
+	                ${object.token_id.generate_link()}
+	                ]]>
+	            </field>
+	    </record>         
+	</data>
+</openerp>
