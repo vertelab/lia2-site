@@ -53,7 +53,19 @@
 			        			<h1>Projekt</h1>
 			        			<br/><br/>			        			
 		        				<t t-foreach="projects" t-as="project">
-		        					<div class="project_list"><a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)"><t t-esc="project.name"/></a><br/><t t-esc="project.description"/></div>
+		        					<div class="project_list">
+		        						<div class="row">
+		        							<div class="col-md-8">
+				        						<b>Projekt:&amp;ensp;</b><a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)">
+				        						<t t-esc="project.name"/></a><br/>
+				        						<br/><t t-if="project.description"><b><p>Beskrivning:</p></b>
+				        						<t t-esc="project.description"/></t>
+				        					</div>
+				        					<div class="col-md-4">
+				        						<b>Status:&amp;ensp;</b><t t-esc="project.state"/>
+				        					</div>
+		        						</div>
+		        					</div>
 		        				</t>			        			
 		        			</div>
 	        				<div class="col-md-4 users_container">
@@ -76,30 +88,74 @@
 
         <template id="project_template" name="Portal Project Template">
         	<t t-call="website.layout">
-        		<div id="project_container">
-        			<h1>Sprints</h1>
-        			<br/><br/>
-        			<ul>
-        				<t t-foreach="project.sprint_ids" t-as="sprint">
-        					<li><a t-att-href="'/lia-portal/%s/sprint/%s' % (token, sprint.id)"><t t-esc="sprint.name"/></a></li>
-        				</t>
-        			</ul>
-
-        		</div>
+        		<div class="container">
+					<h1><t t-esc="project.name"/> - Sprints</h1><br/>
+					<t t-foreach="project.sprint_ids" t-as="sprint">
+						<div class="row">
+							<div class="col-md-8">
+								<div class="sprint_list">
+									<div class="container">
+										<div class="row">
+											<div class="col-md-8">
+												<b>Sprint:&amp;ensp;</b><a t-att-href="'/lia-portal/%s/sprint/%s' % (token, sprint.id)">
+												<t t-esc="sprint.name"/></a>
+											</div>
+											<div class="col-md-4">
+												<b>Start:&amp;ensp;&amp;ensp;</b><t t-esc="sprint.date_start"/><br/>
+												<b>Stopp:&amp;ensp;</b><t t-esc="sprint.date_stop"/>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+							</div>
+						</div>					
+					</t>
+				</div>
         	</t>
         </template>  
 
         <template id="sprint_template" name="Portal Sprint Template">
         	<t t-call="website.layout">
-        		<div id="sprint_container">
-        			<h1>Tasks</h1>
+        		<div class="container">
+        			<h1><t t-esc="sprint.name"/> - Aktiviteter</h1>
         			<br/><br/>
-        			<ul>
-        				<t t-foreach="sprint.task_ids" t-as="task">
-        					<li><a t-att-href="'/lia-portal/%s/sprint/%s/task/%s' % (token, sprint.id, task.id)"><t t-esc="task.name"/></a></li>
-        				</t>
-        			</ul>
-
+        			<div class="row">
+        				<div class="col-md-10">
+	        				<t t-foreach="sprint.task_ids" t-as="task">
+	        					<div class="task_list">
+	        						<div class="row">
+	        							<div class="col-md-8">
+	        								<div id="description" style="padding: 10px; border-right: 1px solid #e5e5e5;">
+					        					<b>Aktivitet:&amp;ensp;</b><t t-esc="task.name"/><br/><br/>
+					        					<t t-if="task.description"><b><p>Beskrivning:</p></b><t t-raw="task.description"/></t>
+				        					</div>
+				        				</div>
+				        				<div class="col-md-4">
+				        					<div id="info" style="padding: 10px;">
+					        					<b>Prioritet:&amp;ensp;&amp;nbsp;&amp;nbsp;</b><t t-esc="task.kanban_state"/><br/>
+					        					<b>Tilldelad:&amp;nbsp;</b>
+					        					<t t-set="employee" t-value="task.user_id and task.user_id.employee_ids and task.user_id.employee_ids[0]"/>
+					        					<t t-if="employee">
+					        						<a t-att-href="'/lia-portal/%s/employee/%s' % (token, employee.id)">
+					        						<t t-esc="employee.name"/></a>
+					        					</t>
+					        					<br/><b>Projekt:&amp;ensp;&amp;ensp;</b>
+					        					<a t-att-href="'/lia-portal/%s/project/%s' % (token, task.sprint_id.project_id.id)">
+					        						<t t-esc="task.sprint_id.project_id.name"/><br/>
+					        					</a>
+					        					<br/><b>Status:&amp;ensp;&amp;ensp;&amp;ensp;</b>
+					        					<t t-esc="task.stage_id.name"/>
+				        					</div>
+				        				</div>
+		        					</div>
+	        					</div>
+	        				</t>	        				
+	        			</div>
+	        			<div class="col-md-2">
+	        			</div>
+        			</div>
         		</div>
         	</t>
         </template>    
@@ -118,38 +174,67 @@
 
         <template id="employee_template" name="Portal Employee Template">
         	<t t-call="website.layout">
-        		<div id="employee_container">
-        			<h1><t t-esc="employee.name"/></h1>
+        		<div id="container" style="margin-bottom: 50px; margin-left: 40px;">
         			<div t-field="employee.website_description"/>
-        			<ul>
-        				<t t-foreach="meetings" t-as="meeting">
-        					<li><a t-att-href="'/lia-portal/%s/meeting/%s' % (token, meeting.id)"><t t-esc="meeting.date_meeting"/></a></li>
-        				</t>
-        			</ul>
-        			<br/><br/>
-        			<p>Projects contributed to:</p>
-        			<br/>
-        			<ul>
-        				<t t-foreach="projects" t-as="project">
-        					<li><a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)"><t t-esc="project.name"/></a></li>
-        				</t>
-        			</ul>        			
+        			<div class="row">        				
+	        			<div class="col-md-8">
+	        				<h3>Scrum-möten</h3>
+	        				<t t-foreach="meetings" t-as="meeting">
+	        					<div class="meeting_list_employee">
+			       					<b>Datum:</b>
+			       					<a t-att-href="'/lia-portal/%s/employee/%s/meeting/%s' % (token, employee.id, meeting.id)">
+	        						&amp;ensp;<t t-esc="meeting.date_meeting"/></a>
+	        					</div>
+	        				</t>
+	        			</div>        				
+        				<div class="col-md-4">
+        					<h3>Medverkat i Projekt</h3>
+	        				<div class="contributed_list">        
+	        					<t t-foreach="projects" t-as="project">
+	        						<ul style="list-style-type: square;">
+	        							<li>
+				        					<a t-att-href="'/lia-portal/%s/project/%s' % (token, project.id)">
+				        					<t t-esc="project.name"/></a>
+	        							</li>
+	        						</ul>
+        						</t>  
+	        				</div>
+        				</div>
+        			</div>    			
         		</div>
         	</t>
         </template>  
 
         <template id="meeting_template" name="Portal Meeting Template">
         	<t t-call="website.layout">
-        		<div id="meeting_container">
-        			<h1><t t-esc="meeting.date_meeting"/></h1>  
-
-      				<h3>Vad har du gjort sedan förra mötet?</h3><br/>
-      				<p><t t-esc="meeting.question_yesterday"/></p><br/>
-      				<h3>Vad planerar du att göra tills nästa möte?</h3><br/>
-      				<p><t t-esc="meeting.question_today"/></p><br/>
-      				<h3>Finns det någonting som hindrar dig?</h3><br/>
-      				<p><t t-esc="meeting.question_blocks"/></p>
-
+        		<div class="container meeting">
+        			<div class="row">
+        				<div class="col-md-10 questions_container">
+		        			<h3><t t-esc="meeting.date_meeting"/></h3>  
+		        			<div class="question">
+			      				<h3>Vad har du gjort sedan förra mötet?</h3>
+			      				<p><t t-esc="meeting.question_yesterday"/></p>
+		      				</div>
+		      				<div class="question">
+			      				<h3>Vad planerar du att göra tills nästa möte?</h3>
+			      				<p><t t-esc="meeting.question_today"/></p>
+		      				</div>
+		      				<div class="question">
+			      				<h3>Finns det någonting som hindrar dig?</h3>
+			      				<p><t t-esc="meeting.question_blocks"/></p>
+			      			</div>
+	      				</div>
+	      				<div class="col-md-2">
+	      					<div class="meeting_list" style="text-align: center;">
+	      						<h3>Möten</h3>
+		      					<ul>
+			        				<t t-foreach="meetings" t-as="meeting">
+			        					<li><a t-att-href="'/lia-portal/%s/employee/%s/meeting/%s' % (token, employee.id, meeting.id)"><t t-esc="meeting.date_meeting"/></a></li>
+			        				</t>
+		      					</ul>
+	      					</div>
+	      				</div>
+      				</div>
         		</div>
         	</t>
         </template> 

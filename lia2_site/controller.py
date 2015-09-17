@@ -59,8 +59,10 @@ class lia2_site(http.Controller):
 	@http.route("/lia-portal/<string:token>/sprint/<int:sprint_id>", type="http", auth="public", website=True)
 	def view_sprint(self, sprint_id=None, token=None, **post):
 		if self.check_token(token, request):
+			sprint = request.env["project.scrum.sprint"].sudo().browse(sprint_id)
+
 			context = {				
-				"sprint" : request.env["project.scrum.sprint"].sudo().browse(sprint_id),
+				"sprint" : sprint,
 				"token" : token	
 			}
 			return request.render("lia2_site.sprint_template", context)
@@ -84,14 +86,18 @@ class lia2_site(http.Controller):
 		else:
 			return request.render("lia2_site.unauthorized_template", None)
 
-	@http.route("/lia-portal/<string:token>/meeting/<int:meeting_id>", type="http", auth="public", website=True)
-	def view_meetings(self, meeting_id=None, token=None, **post):
+	@http.route("/lia-portal/<string:token>/employee/<int:employee_id>/meeting/<int:meeting_id>", type="http", auth="public", website=True)
+	def view_meetings(self, meeting_id=None, employee_id=None, token=None, **post):
 
 		if self.check_token(token, request):
 			meeting = request.env["project.scrum.meeting"].sudo().browse(meeting_id)
+			employee = request.env["hr.employee"].sudo().browse(employee_id)
 
 			context = {
-				"meeting" : meeting
+				"meetings" : request.env["project.scrum.meeting"].sudo().search([("user_id_meeting", "=", employee.id)], order="date_meeting"),
+				"meeting" : meeting,
+				"employee" : employee,
+				"token" : token
 			}
 			return request.render("lia2_site.meeting_template", context)
 		else:
