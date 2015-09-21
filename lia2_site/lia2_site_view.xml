@@ -248,14 +248,17 @@
 
 		<record id="email_template_id" model="email.template">
 	            <field name="name">Email template for sending invite link</field>
-	            <field name="email_from">molk@molk.com</field>
+	            <field name="email_from">lia-studenter@molk.se</field>
 	            <field name="subject">Inbjudan till LIA-portal</field>
 	            <field name="model_id" ref="base.model_res_partner"/>
 	            <field name="auto_delete" eval="True"/>
 	            <field name="email_to">${object.email or ''}</field>
 	            <field name="body_html">
 	                <![CDATA[
-	                <h1>Hej ${object.name} här är din injudningslänk:</h1></br>
+	                <h3>Hej ${object.name}!</h3></br>
+	                <p>Du har blivit inbjuden att ta del av pågående projekt, du har även fått möjligheten att<br/>
+	                på individuell nivå se studenternas prestationer i projekten. Du kan till och med följa deras dagliga möten.</p>
+	                <br/><p>Klicka på länken nedan för att gå vidare till LIA-portalen</p>
 	                ${object.token_id.generate_link()}
 	                ]]>
 	            </field>

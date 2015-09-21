@@ -20,6 +20,8 @@
 
 from openerp import models, api, _, fields
 import random
+import logging
+_logger = logging.getLogger(__name__)
 
 class project_project(models.Model):
 	_inherit = "project.project"
@@ -36,8 +38,6 @@ class user_portal(models.Model):
 class project_token(models.Model):
 	_name = "portal.token"
 	_inherit = ['mail.thread', 'ir.needaction_mixin']
-
-
 
 	def generate_token(self):
 		token = ""
