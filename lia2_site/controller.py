@@ -77,7 +77,7 @@ class lia2_site(http.Controller):
 			employee = request.env["hr.employee"].sudo().browse(employee_id)
 
 			context = {			
-				"meetings" : request.env["project.scrum.meeting"].sudo().search([("user_id_meeting", "=", employee.user_id.id)], order="date_meeting"),
+				"meetings" : request.env["project.scrum.meeting"].sudo().search([("user_id_meeting", "=", employee.user_id.id)], order="date_meeting desc"),
 				"projects" : request.env["project.project"].sudo().search([("members.id", "=", employee.user_id.id)]),	
 				"employee" : employee,
 				"token" : token	
@@ -94,7 +94,7 @@ class lia2_site(http.Controller):
 			employee = request.env["hr.employee"].sudo().browse(employee_id)
 
 			context = {
-				"meetings" : request.env["project.scrum.meeting"].sudo().search([("user_id_meeting", "=", employee.user_id.id)], order="date_meeting"),
+				"meetings" : request.env["project.scrum.meeting"].sudo().search([("user_id_meeting", "=", employee.user_id.id)], order="date_meeting desc"),
 				"meeting" : meeting,
 				"employee" : employee,
 				"token" : token
